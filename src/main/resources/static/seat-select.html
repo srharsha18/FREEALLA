@@ -1,0 +1,402 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Seats – FREEALLA Smart Bus Reservation</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg sticky-top bg-white border-bottom shadow-sm py-2">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-extrabold" href="/">
+                <span class="d-inline-flex justify-content-center align-items-center brand-gradient-orange text-white rounded-3 p-2 shadow-sm" style="width:38px; height:38px;">
+                    <i class="fa-solid fa-bus-simple fs-5"></i>
+                </span>
+                <span class="fs-4 fw-bold tracking-tight text-navy" style="color:var(--primary-navy);">FREE<span class="text-gradient-orange">ALLA</span></span>
+            </a>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#freeallaNav">
+                <i class="fa-solid fa-bars-staggered fs-4"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="freeallaNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-lg-1">
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="/"><i class="fa-solid fa-house me-1"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-semibold text-primary" href="/search"><i class="fa-solid fa-magnifying-glass me-1"></i> Search Buses</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="/my-bookings"><i class="fa-solid fa-ticket me-1"></i> My Bookings</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="/admin"><i class="fa-solid fa-shield-halved me-1 text-danger"></i> Admin Portal</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light rounded-circle p-2 text-muted shadow-sm" onclick="toggleTheme()" title="Toggle Dark/Light Mode" style="width:38px; height:38px;">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <div id="navbar-auth-container" class="d-flex align-items-center gap-2"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- TOP BUS SUMMARY STRIP -->
+    <div class="bg-navy text-white py-3" style="background-color: var(--primary-navy);">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="fw-bold mb-0" id="stripOperator">Loading Bus Details...</h5>
+                    <span class="badge bg-primary rounded-pill" id="stripBadge">AC Sleeper</span>
+                </div>
+                <p class="small text-light opacity-75 mb-0" id="stripRoute">Loading route and timings...</p>
+            </div>
+            <a href="javascript:history.back()" class="btn btn-sm btn-outline-light rounded-pill px-3">
+                <i class="fa-solid fa-arrow-left me-1"></i> Change Bus
+            </a>
+        </div>
+    </div>
+
+    <!-- SEAT SELECTION LAYOUT & SUMMARY -->
+    <div class="container py-4 flex-grow-1">
+        <div class="row g-4">
+            
+            <!-- LEFT: INTERACTIVE BUS SEATING CHASSIS -->
+            <div class="col-lg-7">
+                <div class="card border-0 rounded-4 shadow-sm p-4 bg-white">
+                    
+                    <!-- Header with Legend -->
+                    <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-3 border-bottom gap-2">
+                        <h5 class="fw-bold mb-0"><i class="fa-solid fa-bus me-2 text-primary"></i> Select Your Seats</h5>
+                        
+                        <!-- Deck Switcher (Visible for Sleeper Buses) -->
+                        <div class="btn-group btn-group-sm" id="deckButtonGroup">
+                            <button type="button" class="btn btn-primary active px-3" id="btnLowerDeck" onclick="switchDeck('LOWER')">Lower Deck</button>
+                            <button type="button" class="btn btn-outline-primary px-3" id="btnUpperDeck" onclick="switchDeck('UPPER')">Upper Deck</button>
+                        </div>
+                    </div>
+
+                    <!-- Visual Legend -->
+                    <div class="d-flex flex-wrap justify-content-center gap-4 py-2 mb-4 bg-light rounded-3 p-2">
+                        <div class="legend-pill">
+                            <div class="legend-color-box" style="background-color: #ecfdf5; border: 2px solid #10b981;"></div>
+                            <span>Available</span>
+                        </div>
+                        <div class="legend-pill">
+                            <div class="legend-color-box" style="background-color: var(--secondary-orange); border: 2px solid #d84315;"></div>
+                            <span>Selected</span>
+                        </div>
+                        <div class="legend-pill">
+                            <div class="legend-color-box" style="background-color: #e2e8f0; border: 2px solid #cbd5e1;"></div>
+                            <span>Booked</span>
+                        </div>
+                        <div class="legend-pill">
+                            <div class="legend-color-box" style="background-color: #fdf2f8; border: 2px solid #ec4899;"></div>
+                            <span>Ladies Reserved</span>
+                        </div>
+                    </div>
+
+                    <!-- Bus Physical Representation Chassis -->
+                    <div class="bus-chassis">
+                        <!-- Driver Cabin / Front Indicator -->
+                        <div class="bus-steering">
+                            <div class="steering-wheel-icon" title="Front of Bus / Driver Seat">
+                                <i class="fa-solid fa-circle-dot fs-5"></i>
+                            </div>
+                        </div>
+
+                        <!-- Seats Grid Container -->
+                        <div id="seatMapGrid" class="seat-deck-grid">
+                            <!-- Injected dynamically via JS -->
+                        </div>
+
+                        <div class="text-center mt-3 text-muted small fw-semibold">
+                            <i class="fa-solid fa-arrow-down me-1"></i> Rear of Bus
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- RIGHT: FARE CALCULATION & PROCEED PANEL -->
+            <div class="col-lg-5">
+                <div class="card border-0 rounded-4 shadow-sm p-4 bg-white sticky-top" style="top: 80px;">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom">Booking & Fare Summary</h5>
+
+                    <!-- Selected Seats Display -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Selected Seats</label>
+                        <div id="selectedSeatsPills" class="d-flex flex-wrap gap-2 min-h-36">
+                            <span class="text-muted small italic">No seats selected yet. Click on green seats to select.</span>
+                        </div>
+                    </div>
+
+                    <!-- Promo Code Box -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Apply Promo Coupon</label>
+                        <div class="input-group">
+                            <input type="text" id="couponCodeInput" class="form-control text-uppercase font-monospace" placeholder="e.g. FREEALLA20" value="FREEALLA20">
+                            <button class="btn btn-outline-primary fw-bold" type="button" onclick="applyCoupon()">Apply</button>
+                        </div>
+                        <small class="text-success fw-semibold mt-1 d-block" id="couponFeedback">
+                            <i class="fa-solid fa-tag me-1"></i> Coupon code <strong>FREEALLA20</strong> is active (20% OFF)!
+                        </small>
+                    </div>
+
+                    <!-- Detailed Price Breakdown -->
+                    <div class="bg-light rounded-4 p-3 mb-4">
+                        <div class="d-flex justify-content-between mb-2 small">
+                            <span class="text-muted">Base Fare per Seat:</span>
+                            <span class="fw-semibold" id="summaryBasePrice">₹0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 small">
+                            <span class="text-muted">Total Seat Fare (<span id="summarySeatCount">0</span> seats):</span>
+                            <span class="fw-semibold" id="summaryGrossFare">₹0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 small">
+                            <span class="text-muted">GST & Toll Surcharge (5%):</span>
+                            <span class="fw-semibold" id="summaryTaxes">₹0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 small text-success">
+                            <span>Promotional Discount:</span>
+                            <span class="fw-bold" id="summaryDiscount">- ₹0.00</span>
+                        </div>
+                        <hr class="my-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold fs-6">Net Amount:</span>
+                            <span class="fw-extrabold fs-4 text-success" id="summaryNetPayable">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Proceed CTA -->
+                    <button id="btnProceedToCheckout" class="btn btn-primary brand-gradient-orange border-0 rounded-pill py-3 fw-bold text-white w-100 shadow" disabled onclick="proceedToCheckout()">
+                        Proceed to Passenger Details <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </button>
+                    <p class="text-center small text-muted mt-2 mb-0">Safe, secure transaction protected by 256-bit encryption</p>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const busId = urlParams.get('busId');
+        const travelDate = urlParams.get('date');
+
+        let busDetails = null;
+        let allSeats = [];
+        let selectedSeats = []; // Array of seat objects
+        let activeDeck = 'LOWER';
+        let appliedCoupon = 'FREEALLA20';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!busId) {
+                showToast('No bus selected', 'error');
+                setTimeout(() => window.location.href = '/search', 1000);
+                return;
+            }
+            loadBusAndSeats();
+        });
+
+        async function loadBusAndSeats() {
+            try {
+                // Fetch Bus DTO
+                const busRes = await fetch(`${API_BASE}/buses/${busId}`);
+                busDetails = await busRes.json();
+
+                // Fetch Seats
+                const seatsRes = await fetch(`${API_BASE}/buses/${busId}/seats`);
+                allSeats = await seatsRes.json();
+
+                renderBusHeader();
+                renderSeats();
+                recalculateFares();
+            } catch (e) {
+                showToast('Failed to load bus seat information', 'error');
+            }
+        }
+
+        function renderBusHeader() {
+            document.getElementById('stripOperator').textContent = `${busDetails.operatorName} (${busDetails.busNumber})`;
+            document.getElementById('stripBadge').textContent = busDetails.categoryBadge;
+            document.getElementById('stripRoute').textContent = `${busDetails.sourceCity} ➔ ${busDetails.destinationCity} | Date: ${formatDate(travelDate)} | Dep: ${formatTime(busDetails.departureTime)}`;
+            document.getElementById('summaryBasePrice').textContent = formatCurrency(busDetails.dynamicFare);
+
+            // Hide deck buttons if single deck seater
+            const isSleeper = busDetails.busType.includes('SLEEPER');
+            const deckGroup = document.getElementById('deckButtonGroup');
+            if (!isSleeper) {
+                deckGroup.classList.add('d-none');
+            }
+        }
+
+        function switchDeck(deck) {
+            activeDeck = deck;
+            document.getElementById('btnLowerDeck').classList.toggle('active', deck === 'LOWER');
+            document.getElementById('btnLowerDeck').classList.toggle('btn-primary', deck === 'LOWER');
+            document.getElementById('btnLowerDeck').classList.toggle('btn-outline-primary', deck !== 'LOWER');
+
+            document.getElementById('btnUpperDeck').classList.toggle('active', deck === 'UPPER');
+            document.getElementById('btnUpperDeck').classList.toggle('btn-primary', deck === 'UPPER');
+            document.getElementById('btnUpperDeck').classList.toggle('btn-outline-primary', deck !== 'UPPER');
+
+            renderSeats();
+        }
+
+        function renderSeats() {
+            const grid = document.getElementById('seatMapGrid');
+            const isSleeper = busDetails.busType.includes('SLEEPER');
+
+            const currentDeckSeats = allSeats.filter(s => {
+                if (!isSleeper) return true;
+                return s.deckLevel === activeDeck;
+            });
+
+            grid.innerHTML = currentDeckSeats.map(seat => {
+                const isSelected = selectedSeats.some(s => s.id === seat.id);
+                let stateClass = 'seat-available';
+                if (seat.booked) stateClass = 'seat-booked';
+                else if (isSelected) stateClass = 'seat-selected';
+                else if (seat.ladiesReserved) stateClass = 'seat-ladies';
+
+                const sleeperClass = isSleeper ? 'seat-sleeper' : '';
+
+                return `
+                    <div class="seat-item ${sleeperClass} ${stateClass}"
+                         onclick="toggleSeatSelection(${seat.id})"
+                         title="Seat ${seat.seatNumber} ${seat.booked ? '(Booked)' : seat.ladiesReserved ? '(Ladies Reserved)' : ''}">
+                        <i class="fa-solid ${isSleeper ? 'fa-bed' : 'fa-couch'} mb-1" style="font-size:10px;"></i>
+                        <span>${seat.seatNumber}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleSeatSelection(seatId) {
+            const seat = allSeats.find(s => s.id === seatId);
+            if (!seat || seat.booked) return;
+
+            const index = selectedSeats.findIndex(s => s.id === seatId);
+            if (index > -1) {
+                selectedSeats.splice(index, 1);
+            } else {
+                if (selectedSeats.length >= 6) {
+                    showToast('Maximum 6 seats can be booked in a single transaction', 'info');
+                    return;
+                }
+                selectedSeats.push(seat);
+            }
+
+            renderSeats();
+            renderSelectedPills();
+            recalculateFares();
+        }
+
+        function renderSelectedPills() {
+            const container = document.getElementById('selectedSeatsPills');
+            const btnProceed = document.getElementById('btnProceedToCheckout');
+
+            if (selectedSeats.length === 0) {
+                container.innerHTML = '<span class="text-muted small italic">No seats selected yet. Click on green seats to select.</span>';
+                btnProceed.disabled = true;
+                return;
+            }
+
+            btnProceed.disabled = false;
+            container.innerHTML = selectedSeats.map(s => `
+                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold d-inline-flex align-items-center gap-1 shadow-sm">
+                    <i class="fa-solid fa-couch text-primary"></i> ${s.seatNumber} (${s.deckLevel.charAt(0)})
+                    <i class="fa-solid fa-xmark ms-1 text-danger" style="cursor:pointer;" onclick="toggleSeatSelection(${s.id})"></i>
+                </span>
+            `).join('');
+        }
+
+        function applyCoupon() {
+            const code = document.getElementById('couponCodeInput').value.trim().toUpperCase();
+            const feedback = document.getElementById('couponFeedback');
+            appliedCoupon = code;
+
+            if (code === 'FREEALLA20') {
+                feedback.className = 'text-success fw-semibold mt-1 d-block';
+                feedback.innerHTML = '<i class="fa-solid fa-tag me-1"></i> Coupon <strong>FREEALLA20</strong> applied! 20% discount.';
+                showToast('Coupon FREEALLA20 applied!', 'success');
+            } else if (code === 'FIRST50') {
+                feedback.className = 'text-success fw-semibold mt-1 d-block';
+                feedback.innerHTML = '<i class="fa-solid fa-tag me-1"></i> Coupon <strong>FIRST50</strong> applied! 50% discount up to ₹200.';
+                showToast('Coupon FIRST50 applied!', 'success');
+            } else if (code === 'SAVE100') {
+                feedback.className = 'text-success fw-semibold mt-1 d-block';
+                feedback.innerHTML = '<i class="fa-solid fa-tag me-1"></i> Coupon <strong>SAVE100</strong> applied! Flat ₹100 discount.';
+                showToast('Coupon SAVE100 applied!', 'success');
+            } else if (code === '') {
+                feedback.className = 'text-muted small mt-1 d-block';
+                feedback.innerHTML = 'No coupon applied.';
+            } else {
+                feedback.className = 'text-danger fw-semibold mt-1 d-block';
+                feedback.innerHTML = '<i class="fa-solid fa-circle-xmark me-1"></i> Invalid coupon code.';
+                showToast('Invalid coupon code', 'error');
+            }
+
+            recalculateFares();
+        }
+
+        function recalculateFares() {
+            const count = selectedSeats.length;
+            const singleFare = busDetails ? busDetails.dynamicFare : 0;
+            const grossFare = count * singleFare;
+            const taxes = Math.round(grossFare * 0.05 * 100) / 100;
+
+            let discount = 0;
+            if (appliedCoupon === 'FREEALLA20') {
+                discount = Math.round(grossFare * 0.20 * 100) / 100;
+            } else if (appliedCoupon === 'FIRST50') {
+                discount = Math.min(grossFare * 0.50, 200);
+            } else if (appliedCoupon === 'SAVE100') {
+                discount = Math.min(grossFare, 100);
+            }
+
+            const netPayable = Math.max(0, (grossFare + taxes) - discount);
+
+            document.getElementById('summarySeatCount').textContent = count;
+            document.getElementById('summaryGrossFare').textContent = formatCurrency(grossFare);
+            document.getElementById('summaryTaxes').textContent = formatCurrency(taxes);
+            document.getElementById('summaryDiscount').textContent = '- ' + formatCurrency(discount);
+            document.getElementById('summaryNetPayable').textContent = formatCurrency(netPayable);
+        }
+
+        function proceedToCheckout() {
+            if (selectedSeats.length === 0) return;
+
+            // Save booking draft to sessionStorage
+            const draft = {
+                busId: busDetails.id,
+                operatorName: busDetails.operatorName,
+                busNumber: busDetails.busNumber,
+                busType: busDetails.categoryBadge,
+                sourceCity: busDetails.sourceCity,
+                destinationCity: busDetails.destinationCity,
+                journeyDate: travelDate,
+                departureTime: busDetails.departureTime,
+                seats: selectedSeats.map(s => ({ id: s.id, number: s.seatNumber, deck: s.deckLevel })),
+                couponCode: appliedCoupon,
+                baseFare: busDetails.dynamicFare
+            };
+
+            sessionStorage.setItem('freealla_booking_draft', JSON.stringify(draft));
+            window.location.href = '/checkout';
+        }
+    </script>
+</body>
+</html>
+

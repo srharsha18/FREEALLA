@@ -1,0 +1,434 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Buses – FREEALLA Smart Bus Reservation</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg sticky-top bg-white border-bottom shadow-sm py-2">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-extrabold" href="/">
+                <span class="d-inline-flex justify-content-center align-items-center brand-gradient-orange text-white rounded-3 p-2 shadow-sm" style="width:38px; height:38px;">
+                    <i class="fa-solid fa-bus-simple fs-5"></i>
+                </span>
+                <span class="fs-4 fw-bold tracking-tight text-navy" style="color:var(--primary-navy);">FREE<span class="text-gradient-orange">ALLA</span></span>
+            </a>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#freeallaNav">
+                <i class="fa-solid fa-bars-staggered fs-4"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="freeallaNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-lg-1">
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="/"><i class="fa-solid fa-house me-1"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-semibold text-primary" href="/search"><i class="fa-solid fa-magnifying-glass me-1"></i> Search Buses</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="/my-bookings"><i class="fa-solid fa-ticket me-1"></i> My Bookings</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="/admin"><i class="fa-solid fa-shield-halved me-1 text-danger"></i> Admin Portal</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light rounded-circle p-2 text-muted shadow-sm" onclick="toggleTheme()" title="Toggle Dark/Light Mode" style="width:38px; height:38px;">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <div id="navbar-auth-container" class="d-flex align-items-center gap-2"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SEARCH CRITERIA HEADER BAR -->
+    <div class="bg-navy text-white py-3" style="background-color: var(--primary-navy);">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <h4 class="fw-bold mb-0" id="headerRouteTitle">Available Buses</h4>
+                    <span class="badge bg-primary rounded-pill px-3 py-1" id="busCountBadge">Loading...</span>
+                </div>
+                <p class="small text-light opacity-75 mb-0" id="headerDateSub">Select your journey preferences</p>
+            </div>
+            <button class="btn btn-sm btn-outline-light rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#modifySearchBox">
+                <i class="fa-solid fa-pen-to-square me-1"></i> Modify Search
+            </button>
+        </div>
+    </div>
+
+    <!-- MODIFY SEARCH COLLAPSIBLE PANEL -->
+    <div class="collapse bg-white border-bottom shadow-sm" id="modifySearchBox">
+        <div class="container py-3">
+            <form onsubmit="handleModifySearch(event)" class="row g-2 align-items-center">
+                <div class="col-md-3">
+                    <input type="text" id="modFrom" class="form-control" placeholder="From City" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" id="modTo" class="form-control" placeholder="To City" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="date" id="modDate" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100 brand-gradient-orange border-0 text-white fw-bold">Update Results</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN SEARCH CONTENT -->
+    <div class="container py-4 flex-grow-1">
+        <div class="row g-4">
+            
+            <!-- LEFT FILTERS SIDEBAR -->
+            <div class="col-lg-3">
+                <div class="card border-0 rounded-4 shadow-sm p-3 bg-white sticky-top" style="top: 80px;">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <h6 class="fw-bold mb-0"><i class="fa-solid fa-sliders me-1 text-primary"></i> Filter Results</h6>
+                        <button class="btn btn-link btn-sm text-decoration-none p-0 text-muted" onclick="resetFilters()">Reset All</button>
+                    </div>
+
+                    <!-- Filter 1: Bus Classification -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted mb-2">Bus Type</label>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input filter-type" type="radio" name="busType" id="typeAll" value="ALL" checked onchange="applyFilters()">
+                                <label class="form-check-label small" for="typeAll">All Types</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input filter-type" type="radio" name="busType" id="typeAcSleeper" value="AC_SLEEPER" onchange="applyFilters()">
+                                <label class="form-check-label small" for="typeAcSleeper">AC Sleeper</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input filter-type" type="radio" name="busType" id="typeAcSeater" value="AC_SEATER" onchange="applyFilters()">
+                                <label class="form-check-label small" for="typeAcSeater">AC Seater</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input filter-type" type="radio" name="busType" id="typeNonAc" value="NON_AC_SEATER" onchange="applyFilters()">
+                                <label class="form-check-label small" for="typeNonAc">Non-AC Seater</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter 2: Max Price Range -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label small fw-bold text-uppercase text-muted mb-0">Max Fare</label>
+                            <span class="badge bg-light text-dark fw-bold" id="priceLabel">₹1500</span>
+                        </div>
+                        <input type="range" class="form-range" id="priceRange" min="300" max="2000" step="50" value="2000" oninput="updatePriceLabel(this.value)" onchange="applyFilters()">
+                        <div class="d-flex justify-content-between small text-muted">
+                            <span>₹300</span>
+                            <span>₹2000</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter 3: Departure Time -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted mb-2">Departure Time</label>
+                        <div class="row g-2 text-center">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-secondary btn-sm w-100 time-slot-btn py-2" data-slot="morning" onclick="toggleTimeSlot(this)">
+                                    <i class="fa-solid fa-sun d-block mb-1 text-warning"></i>
+                                    <span class="small" style="font-size:11px;">6AM - 12PM</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-secondary btn-sm w-100 time-slot-btn py-2" data-slot="afternoon" onclick="toggleTimeSlot(this)">
+                                    <i class="fa-solid fa-cloud-sun d-block mb-1 text-primary"></i>
+                                    <span class="small" style="font-size:11px;">12PM - 6PM</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-secondary btn-sm w-100 time-slot-btn py-2" data-slot="evening" onclick="toggleTimeSlot(this)">
+                                    <i class="fa-solid fa-moon d-block mb-1 text-info"></i>
+                                    <span class="small" style="font-size:11px;">After 6PM</span>
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-secondary btn-sm w-100 time-slot-btn py-2 active" data-slot="all" onclick="toggleTimeSlot(this)">
+                                    <i class="fa-solid fa-clock d-block mb-1 text-success"></i>
+                                    <span class="small" style="font-size:11px;">All Day</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- RIGHT BUS CARDS LIST -->
+            <div class="col-lg-9">
+                <!-- Sorting & Quick stats -->
+                <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-white rounded-4 shadow-sm border-0">
+                    <span class="small text-muted" id="resultsSummaryText">Showing available bus schedules</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="small text-muted fw-bold">Sort By:</span>
+                        <select id="sortBy" class="form-select form-select-sm rounded-3 border" style="width: auto;" onchange="applySorting()">
+                            <option value="fare_asc">Price: Low to High</option>
+                            <option value="fare_desc">Price: High to Low</option>
+                            <option value="dep_asc">Departure Time: Earliest</option>
+                            <option value="rating_desc">Ratings: Highest First</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Bus Cards Container -->
+                <div id="busCardsContainer" class="d-flex flex-column gap-3">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="noBusesCard" class="card border-0 rounded-4 shadow-sm p-5 text-center bg-white d-none">
+                    <div class="mb-3 text-muted">
+                        <i class="fa-solid fa-bus-simple fa-3x opacity-25"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1">No Buses Found For This Route</h5>
+                    <p class="text-muted small max-w-md mx-auto mb-4">Try searching for other popular routes like <strong>Mumbai ➔ Pune</strong>, <strong>Bangalore ➔ Chennai</strong>, or <strong>Delhi ➔ Jaipur</strong>.</p>
+                    <div>
+                        <button class="btn btn-primary brand-gradient-orange border-0 rounded-pill px-4 fw-bold" onclick="resetSearchToPopular()">View All Available Buses</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+
+    <script>
+        let allBuses = [];
+        let filteredBuses = [];
+        let selectedTimeSlot = 'all';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentFrom = urlParams.get('from') || '';
+        let currentTo = urlParams.get('to') || '';
+        let currentDate = urlParams.get('date') || '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentDate) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                currentDate = tomorrow.toISOString().split('T')[0];
+            }
+
+            document.getElementById('modFrom').value = currentFrom;
+            document.getElementById('modTo').value = currentTo;
+            document.getElementById('modDate').value = currentDate;
+
+            updateHeaderBar();
+            loadBuses();
+        });
+
+        function updateHeaderBar() {
+            const titleEl = document.getElementById('headerRouteTitle');
+            const subEl = document.getElementById('headerDateSub');
+
+            if (currentFrom && currentTo) {
+                titleEl.textContent = `${currentFrom} ➔ ${currentTo}`;
+                subEl.textContent = `Journey Date: ${formatDate(currentDate)}`;
+            } else {
+                titleEl.textContent = "All Intercity Routes";
+                subEl.textContent = `Exploring All Available Buses • ${formatDate(currentDate)}`;
+            }
+        }
+
+        async function loadBuses() {
+            let url = `${API_BASE}/buses/search?`;
+            if (currentFrom) url += `from=${encodeURIComponent(currentFrom)}&`;
+            if (currentTo) url += `to=${encodeURIComponent(currentTo)}&`;
+            if (currentDate) url += `date=${encodeURIComponent(currentDate)}`;
+
+            try {
+                const res = await fetch(url);
+                allBuses = await res.json();
+                applyFilters();
+            } catch (err) {
+                showToast('Failed to load buses. Backend might not be running.', 'error');
+            }
+        }
+
+        function updatePriceLabel(val) {
+            document.getElementById('priceLabel').textContent = '₹' + val;
+        }
+
+        function toggleTimeSlot(btn) {
+            document.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('active', 'btn-primary'));
+            btn.classList.add('active');
+            selectedTimeSlot = btn.getAttribute('data-slot');
+            applyFilters();
+        }
+
+        function resetFilters() {
+            document.getElementById('typeAll').checked = true;
+            document.getElementById('priceRange').value = 2000;
+            updatePriceLabel(2000);
+            selectedTimeSlot = 'all';
+            document.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-slot="all"]').classList.add('active');
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const typeFilter = document.querySelector('input[name="busType"]:checked').value;
+            const maxPrice = parseFloat(document.getElementById('priceRange').value);
+
+            filteredBuses = allBuses.filter(bus => {
+                // Bus Type filter
+                if (typeFilter !== 'ALL' && bus.busType !== typeFilter) return false;
+
+                // Price filter
+                if (bus.dynamicFare > maxPrice) return false;
+
+                // Departure Time Slot filter
+                if (selectedTimeSlot !== 'all' && bus.departureTime) {
+                    const hour = parseInt(bus.departureTime.split(':')[0], 10);
+                    if (selectedTimeSlot === 'morning' && (hour < 6 || hour >= 12)) return false;
+                    if (selectedTimeSlot === 'afternoon' && (hour < 12 || hour >= 18)) return false;
+                    if (selectedTimeSlot === 'evening' && hour < 18) return false;
+                }
+
+                return true;
+            });
+
+            applySorting();
+        }
+
+        function applySorting() {
+            const sortMode = document.getElementById('sortBy').value;
+            if (sortMode === 'fare_asc') {
+                filteredBuses.sort((a, b) => a.dynamicFare - b.dynamicFare);
+            } else if (sortMode === 'fare_desc') {
+                filteredBuses.sort((a, b) => b.dynamicFare - a.dynamicFare);
+            } else if (sortMode === 'dep_asc') {
+                filteredBuses.sort((a, b) => a.departureTime.localeCompare(b.departureTime));
+            } else if (sortMode === 'rating_desc') {
+                filteredBuses.sort((a, b) => b.rating - a.rating);
+            }
+
+            renderBusCards();
+        }
+
+        function renderBusCards() {
+            const container = document.getElementById('busCardsContainer');
+            const noBuses = document.getElementById('noBusesCard');
+            const badge = document.getElementById('busCountBadge');
+            const summary = document.getElementById('resultsSummaryText');
+
+            badge.textContent = `${filteredBuses.length} Buses Found`;
+            summary.textContent = `Showing ${filteredBuses.length} of ${allBuses.length} bus options`;
+
+            if (filteredBuses.length === 0) {
+                container.innerHTML = '';
+                noBuses.classList.remove('d-none');
+                return;
+            }
+
+            noBuses.classList.add('d-none');
+            container.innerHTML = filteredBuses.map(bus => `
+                <div class="card border-0 rounded-4 shadow-sm p-4 bg-white hover-shadow transition">
+                    <div class="row align-items-center g-3">
+                        
+                        <!-- Left: Bus Details -->
+                        <div class="col-lg-4 col-md-12">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="fw-bold mb-0">${bus.operatorName}</h5>
+                                <span class="badge bg-success text-white rounded-pill px-2 py-1 small" style="font-size:11px;">
+                                    <i class="fa-solid fa-star"></i> ${bus.rating}
+                                </span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="badge bg-light text-primary border rounded-pill">${bus.categoryBadge}</span>
+                                <span class="small text-muted">${bus.busNumber}</span>
+                            </div>
+                            <div class="small text-muted">
+                                <i class="fa-solid fa-location-dot me-1 text-danger"></i> ${bus.sourceCity || 'Source'} ➔ ${bus.destinationCity || 'Destination'}
+                            </div>
+                        </div>
+
+                        <!-- Center: Timings & Duration -->
+                        <div class="col-lg-4 col-md-6 text-lg-center">
+                            <div class="d-flex justify-content-between justify-content-lg-center align-items-center gap-3">
+                                <div>
+                                    <h4 class="fw-bold mb-0">${formatTime(bus.departureTime)}</h4>
+                                    <small class="text-muted">${bus.sourceCity || ''}</small>
+                                </div>
+                                <div class="text-center px-2">
+                                    <small class="badge bg-light text-muted border rounded-pill px-2 py-1">${bus.durationHours} hrs</small>
+                                    <div class="border-top border-2 border-primary border-dashed my-1" style="width: 50px;"></div>
+                                </div>
+                                <div>
+                                    <h4 class="fw-bold mb-0">${formatTime(bus.arrivalTime)}</h4>
+                                    <small class="text-muted">${bus.destinationCity || ''}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Pricing & Select Seats CTA -->
+                        <div class="col-lg-4 col-md-6 text-lg-end">
+                            <div class="mb-2">
+                                <span class="text-muted small">Starting from</span>
+                                <h3 class="fw-extrabold text-success mb-0">${formatCurrency(bus.dynamicFare)}</h3>
+                                <small class="text-muted fw-semibold">
+                                    <i class="fa-solid fa-couch text-success me-1"></i> ${bus.availableSeats} Seats Left
+                                </small>
+                            </div>
+                            <button class="btn btn-primary brand-gradient-orange border-0 rounded-pill px-4 py-2 fw-bold text-white shadow-sm"
+                                    onclick="goToSeatSelection(${bus.id})">
+                                Select Seats <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <!-- Amenities Bar -->
+                    <div class="pt-3 mt-3 border-top d-flex flex-wrap gap-2 align-items-center">
+                        <small class="text-muted fw-bold me-1">Amenities:</small>
+                        ${(bus.amenities || []).map(a => `
+                            <span class="badge bg-light text-dark border rounded-pill px-2 py-1" style="font-size:11px;">
+                                <i class="fa-solid fa-check text-success me-1"></i> ${a}
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function goToSeatSelection(busId) {
+            window.location.href = `/seat-select?busId=${busId}&date=${encodeURIComponent(currentDate)}`;
+        }
+
+        function handleModifySearch(event) {
+            event.preventDefault();
+            currentFrom = document.getElementById('modFrom').value.trim();
+            currentTo = document.getElementById('modTo').value.trim();
+            currentDate = document.getElementById('modDate').value;
+            updateHeaderBar();
+            loadBuses();
+            const collapseEl = document.getElementById('modifySearchBox');
+            bootstrap.Collapse.getInstance(collapseEl).hide();
+        }
+
+        function resetSearchToPopular() {
+            currentFrom = '';
+            currentTo = '';
+            document.getElementById('modFrom').value = '';
+            document.getElementById('modTo').value = '';
+            updateHeaderBar();
+            loadBuses();
+        }
+    </script>
+</body>
+</html>
+

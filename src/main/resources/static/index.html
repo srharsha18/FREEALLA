@@ -1,0 +1,602 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FREEALLA – Smart Bus Reservation System | Your Journey, Your Seat, Your Way</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+    <!-- ================================================================= -->
+    <!-- NAVBAR -->
+    <!-- ================================================================= -->
+    <nav class="navbar navbar-expand-lg sticky-top bg-white border-bottom shadow-sm py-2">
+        <div class="container">
+            <!-- Brand Logo -->
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-extrabold" href="/">
+                <span class="d-inline-flex justify-content-center align-items-center brand-gradient-orange text-white rounded-3 p-2 shadow-sm" style="width:38px; height:38px;">
+                    <i class="fa-solid fa-bus-simple fs-5"></i>
+                </span>
+                <span class="fs-4 fw-bold tracking-tight text-navy" style="color:var(--primary-navy);">FREE<span class="text-gradient-orange">ALLA</span></span>
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#freeallaNav">
+                <i class="fa-solid fa-bars-staggered fs-4"></i>
+            </button>
+
+            <!-- Nav Links -->
+            <div class="collapse navbar-collapse" id="freeallaNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-lg-1">
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold text-primary" href="/"><i class="fa-solid fa-house me-1"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="/search"><i class="fa-solid fa-magnifying-glass me-1"></i> Search Buses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="/my-bookings"><i class="fa-solid fa-ticket me-1"></i> My Bookings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="/admin"><i class="fa-solid fa-shield-halved me-1 text-danger"></i> Admin Portal</a>
+                    </li>
+                </ul>
+
+                <!-- Right Side Actions: Theme switch & Auth -->
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Dark Mode Switch -->
+                    <button class="btn btn-light rounded-circle p-2 text-muted shadow-sm" onclick="toggleTheme()" title="Toggle Dark/Light Mode" style="width:38px; height:38px;">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+
+                    <!-- Auth Container (dynamically injected via app.js) -->
+                    <div id="navbar-auth-container" class="d-flex align-items-center gap-2"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================================================================= -->
+    <!-- HERO SECTION -->
+    <!-- ================================================================= -->
+    <header class="hero-wrapper text-center">
+        <div class="hero-pattern"></div>
+        <div class="container position-relative z-1 py-4">
+            <span class="badge rounded-pill bg-white text-dark px-3 py-2 mb-3 fw-bold shadow-sm">
+                <i class="fa-solid fa-sparkles text-warning me-1"></i> Redefining Modern Travel Booking
+            </span>
+            <h1 class="display-4 fw-extrabold mb-3">Your Journey, Your Seat, <span class="text-gradient-orange">Your Way.</span></h1>
+            <p class="lead text-light opacity-75 max-w-2xl mx-auto mb-4" style="max-width: 650px;">
+                Experience seamless intercity bus travel with live visual seat selection, instant digital boarding passes, and verified premium fleet operators across India.
+            </p>
+        </div>
+    </header>
+
+    <!-- ================================================================= -->
+    <!-- FLOATING SEARCH WIDGET -->
+    <!-- ================================================================= -->
+    <section class="container">
+        <div class="floating-search-card">
+            <form id="busSearchForm" onsubmit="handleSearchSubmit(event)">
+                <div class="row g-3 align-items-center">
+                    <!-- From City -->
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label small fw-bold text-muted mb-1"><i class="fa-solid fa-location-dot text-primary me-1"></i> FROM CITY</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-plane-departure text-muted"></i></span>
+                            <input list="fromCityList" id="searchFrom" class="form-control form-control-lg border-start-0 fs-6 fw-bold" placeholder="e.g. Mumbai" required>
+                            <datalist id="fromCityList">
+                                <option value="Mumbai">
+                                <option value="Bangalore">
+                                <option value="Delhi">
+                                <option value="Hyderabad">
+                                <option value="Pune">
+                                <option value="Ahmedabad">
+                            </datalist>
+                        </div>
+                    </div>
+
+                    <!-- Swap Button -->
+                    <div class="col-lg-1 col-md-12 text-center d-none d-lg-block">
+                        <button type="button" class="btn btn-outline-secondary rounded-circle mt-3" style="width:40px; height:40px;" onclick="swapCities()" title="Swap Cities">
+                            <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                        </button>
+                    </div>
+
+                    <!-- To City -->
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label small fw-bold text-muted mb-1"><i class="fa-solid fa-location-crosshairs text-danger me-1"></i> TO CITY</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-plane-arrival text-muted"></i></span>
+                            <input list="toCityList" id="searchTo" class="form-control form-control-lg border-start-0 fs-6 fw-bold" placeholder="e.g. Pune" required>
+                            <datalist id="toCityList">
+                                <option value="Pune">
+                                <option value="Chennai">
+                                <option value="Jaipur">
+                                <option value="Bangalore">
+                                <option value="Goa">
+                                <option value="Mumbai">
+                            </datalist>
+                        </div>
+                    </div>
+
+                    <!-- Travel Date -->
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label small fw-bold text-muted mb-1"><i class="fa-regular fa-calendar-days text-primary me-1"></i> JOURNEY DATE</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-regular fa-calendar text-muted"></i></span>
+                            <input type="date" id="searchDate" class="form-control form-control-lg border-start-0 fs-6 fw-bold" required>
+                        </div>
+                    </div>
+
+                    <!-- CTA Button -->
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label d-none d-lg-block">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 brand-gradient-orange border-0 text-white fw-bold shadow">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- POPULAR ROUTES SECTION -->
+    <!-- ================================================================= -->
+    <section class="py-5">
+        <div class="container py-3">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <span class="text-gradient-orange fw-bold text-uppercase small tracking-wider">Top Destinations</span>
+                    <h2 class="fw-bold mb-0">Trending Intercity Routes</h2>
+                </div>
+                <a href="/search" class="btn btn-outline-primary rounded-pill btn-sm px-3 fw-semibold">View All Routes <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+
+            <div class="row g-4">
+                <!-- Route 1 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 hover-shadow transition p-3 bg-white" onclick="quickSearch('Mumbai', 'Pune')" style="cursor:pointer;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-light text-primary rounded-pill px-3 py-2 fw-bold"><i class="fa-solid fa-bolt text-warning me-1"></i> High Frequency</span>
+                            <span class="fw-bold text-success fs-5">From ₹450</span>
+                        </div>
+                        <h5 class="fw-bold mb-1">Mumbai ➔ Pune</h5>
+                        <p class="text-muted small mb-3"><i class="fa-solid fa-road me-1"></i> 150 km &bull; ~3.5 hours</p>
+                        <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                            <span class="text-muted small">3+ Daily Buses</span>
+                            <span class="text-primary fw-bold small">Book Now <i class="fa-solid fa-chevron-right ms-1"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Route 2 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 hover-shadow transition p-3 bg-white" onclick="quickSearch('Bangalore', 'Chennai')" style="cursor:pointer;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-light text-primary rounded-pill px-3 py-2 fw-bold"><i class="fa-solid fa-star text-warning me-1"></i> Popular</span>
+                            <span class="fw-bold text-success fs-5">From ₹680</span>
+                        </div>
+                        <h5 class="fw-bold mb-1">Bangalore ➔ Chennai</h5>
+                        <p class="text-muted small mb-3"><i class="fa-solid fa-road me-1"></i> 350 km &bull; ~6.0 hours</p>
+                        <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                            <span class="text-muted small">2+ Daily Buses</span>
+                            <span class="text-primary fw-bold small">Book Now <i class="fa-solid fa-chevron-right ms-1"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Route 3 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 hover-shadow transition p-3 bg-white" onclick="quickSearch('Delhi', 'Jaipur')" style="cursor:pointer;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-light text-primary rounded-pill px-3 py-2 fw-bold"><i class="fa-solid fa-gem text-warning me-1"></i> Royal Express</span>
+                            <span class="fw-bold text-success fs-5">From ₹550</span>
+                        </div>
+                        <h5 class="fw-bold mb-1">Delhi ➔ Jaipur</h5>
+                        <p class="text-muted small mb-3"><i class="fa-solid fa-road me-1"></i> 280 km &bull; ~5.0 hours</p>
+                        <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                            <span class="text-muted small">2+ Daily Buses</span>
+                            <span class="text-primary fw-bold small">Book Now <i class="fa-solid fa-chevron-right ms-1"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Route 4 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 hover-shadow transition p-3 bg-white" onclick="quickSearch('Hyderabad', 'Bangalore')" style="cursor:pointer;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-light text-primary rounded-pill px-3 py-2 fw-bold"><i class="fa-solid fa-moon text-info me-1"></i> Overnight Sleeper</span>
+                            <span class="fw-bold text-success fs-5">From ₹1350</span>
+                        </div>
+                        <h5 class="fw-bold mb-1">Hyderabad ➔ Bangalore</h5>
+                        <p class="text-muted small mb-3"><i class="fa-solid fa-road me-1"></i> 570 km &bull; ~9.5 hours</p>
+                        <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                            <span class="text-muted small">BharatBenz Multi-Axle</span>
+                            <span class="text-primary fw-bold small">Book Now <i class="fa-solid fa-chevron-right ms-1"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- WHY CHOOSE FREEALLA -->
+    <!-- ================================================================= -->
+    <section class="py-5 bg-light">
+        <div class="container py-4">
+            <div class="text-center max-w-xl mx-auto mb-5">
+                <span class="badge rounded-pill bg-white text-primary px-3 py-2 mb-2 fw-bold shadow-sm">The FREEALLA Advantage</span>
+                <h2 class="fw-bold">Designed for Comfort & Reliability</h2>
+                <p class="text-muted">Modern architecture powered by clean Object-Oriented software engineering.</p>
+            </div>
+
+            <div class="row g-4 text-center">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 rounded-4 shadow-sm p-4 h-100 bg-white">
+                        <div class="rounded-circle brand-gradient-orange text-white d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width:60px; height:60px;">
+                            <i class="fa-solid fa-couch fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold">Interactive Seat Map</h5>
+                        <p class="text-muted small mb-0">Choose your exact preferred seat with real-time deck views (Lower & Upper) and live availability.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 rounded-4 shadow-sm p-4 h-100 bg-white">
+                        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width:60px; height:60px;">
+                            <i class="fa-solid fa-qrcode fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold">Instant Digital E-Ticket</h5>
+                        <p class="text-muted small mb-0">Receive a digital boarding pass with unique PNR, simulated QR code, and instant print/download capability.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 rounded-4 shadow-sm p-4 h-100 bg-white">
+                        <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width:60px; height:60px;">
+                            <i class="fa-solid fa-shield-heart fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold">Safe & Verified Fleets</h5>
+                        <p class="text-muted small mb-0">Partnered exclusively with verified operators adhering to high hygiene, safety, and GPS tracking standards.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 rounded-4 shadow-sm p-4 h-100 bg-white">
+                        <div class="rounded-circle bg-dark text-white d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width:60px; height:60px;">
+                            <i class="fa-solid fa-headset fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold">24/7 Smart Assistance</h5>
+                        <p class="text-muted small mb-0">Transparent booking policies with self-service cancellation and simulated instant refund processing.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- FEATURED BUS OPERATORS -->
+    <!-- ================================================================= -->
+    <section class="py-5">
+        <div class="container py-3">
+            <div class="text-center mb-5">
+                <span class="text-gradient-orange fw-bold text-uppercase small">Premier Operators</span>
+                <h2 class="fw-bold">Travelling with India's Best Fleets</h2>
+            </div>
+            <div class="row g-4 align-items-center justify-content-center">
+                <div class="col-6 col-md-3 text-center">
+                    <div class="p-3 border rounded-4 bg-white shadow-sm">
+                        <i class="fa-solid fa-bus-simple fs-2 text-primary mb-2"></i>
+                        <h6 class="fw-bold mb-0">IntrCity SmartBus</h6>
+                        <small class="text-muted">4.8 &starf; Multi-Axle</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <div class="p-3 border rounded-4 bg-white shadow-sm">
+                        <i class="fa-solid fa-bolt fs-2 text-warning mb-2"></i>
+                        <h6 class="fw-bold mb-0">Zingbus Electric</h6>
+                        <small class="text-muted">4.7 &starf; Eco Lounge</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <div class="p-3 border rounded-4 bg-white shadow-sm">
+                        <i class="fa-solid fa-leaf fs-2 text-success mb-2"></i>
+                        <h6 class="fw-bold mb-0">Greenline Volvo</h6>
+                        <small class="text-muted">4.9 &starf; Sleeper Premium</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <div class="p-3 border rounded-4 bg-white shadow-sm">
+                        <i class="fa-solid fa-crown fs-2 text-danger mb-2"></i>
+                        <h6 class="fw-bold mb-0">Orange Travels</h6>
+                        <small class="text-muted">4.7 &starf; Scania Luxury</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- CUSTOMER TESTIMONIALS -->
+    <!-- ================================================================= -->
+    <section class="py-5 bg-light">
+        <div class="container py-3">
+            <div class="text-center mb-5">
+                <span class="text-gradient-orange fw-bold text-uppercase small">Testimonials</span>
+                <h2 class="fw-bold">What Happy Passengers Say</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card border-0 rounded-4 shadow-sm p-4 bg-white h-100">
+                        <div class="text-warning mb-2">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-muted small mb-3">"The interactive seat selection on FREEALLA is so intuitive. I booked lower sleeper berths for my parents with just a couple clicks. Excellent UI!"</p>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width:40px; height:40px;">AK</div>
+                            <div>
+                                <h6 class="fw-bold mb-0">Ananya Kulkarni</h6>
+                                <small class="text-muted">Pune to Mumbai</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card border-0 rounded-4 shadow-sm p-4 bg-white h-100">
+                        <div class="text-warning mb-2">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                        </div>
+                        <p class="text-muted small mb-3">"Got my digital E-Ticket with QR code instantly upon checkout. Showed the ticket directly on my mobile while boarding. Super clean experience."</p>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle brand-gradient-orange text-white d-flex align-items-center justify-content-center fw-bold" style="width:40px; height:40px;">RS</div>
+                            <div>
+                                <h6 class="fw-bold mb-0">Rohan Sengupta</h6>
+                                <small class="text-muted">Bangalore to Chennai</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card border-0 rounded-4 shadow-sm p-4 bg-white h-100">
+                        <div class="text-warning mb-2">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-muted small mb-3">"Applied coupon FREEALLA20 and saved 20% on my Delhi-Jaipur Zingbus trip. Loved the transparent pricing and seat layout!"</p>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fw-bold" style="width:40px; height:40px;">SM</div>
+                            <div>
+                                <h6 class="fw-bold mb-0">Sneha Mishra</h6>
+                                <small class="text-muted">Delhi to Jaipur</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- FOOTER -->
+    <!-- ================================================================= -->
+    <footer class="bg-navy text-white pt-5 pb-4" style="background-color: var(--primary-navy);">
+        <div class="container">
+            <div class="row g-4 pb-4 border-bottom border-secondary border-opacity-25">
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="d-inline-flex justify-content-center align-items-center brand-gradient-orange text-white rounded-3 p-2 shadow-sm" style="width:34px; height:34px;">
+                            <i class="fa-solid fa-bus-simple fs-6"></i>
+                        </span>
+                        <span class="fs-4 fw-bold">FREE<span class="text-gradient-orange">ALLA</span></span>
+                    </div>
+                    <p class="text-light opacity-75 small mb-3">
+                        FREEALLA is an advanced intercity bus ticketing platform demonstrating modern Object-Oriented software engineering with Spring Boot & Clean Architecture.
+                    </p>
+                    <p class="small text-light opacity-50 mb-0">Tagline: <em>"Your Journey, Your Seat, Your Way."</em></p>
+                </div>
+
+                <div class="col-lg-2 col-6">
+                    <h6 class="fw-bold mb-3 text-light">Quick Links</h6>
+                    <ul class="list-unstyled small text-light opacity-75 d-flex flex-column gap-2 mb-0">
+                        <li><a href="/" class="text-reset text-decoration-none hover-orange">Home</a></li>
+                        <li><a href="/search" class="text-reset text-decoration-none hover-orange">Search Buses</a></li>
+                        <li><a href="/my-bookings" class="text-reset text-decoration-none hover-orange">My Bookings</a></li>
+                        <li><a href="/admin" class="text-reset text-decoration-none hover-orange">Admin Dashboard</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-6">
+                    <h6 class="fw-bold mb-3 text-light">Popular Cities</h6>
+                    <ul class="list-unstyled small text-light opacity-75 d-flex flex-column gap-2 mb-0">
+                        <li><a href="javascript:void(0)" onclick="quickSearch('Mumbai','Pune')" class="text-reset text-decoration-none">Mumbai &bull; Pune</a></li>
+                        <li><a href="javascript:void(0)" onclick="quickSearch('Bangalore','Chennai')" class="text-reset text-decoration-none">Bangalore &bull; Chennai</a></li>
+                        <li><a href="javascript:void(0)" onclick="quickSearch('Delhi','Jaipur')" class="text-reset text-decoration-none">Delhi &bull; Jaipur</a></li>
+                        <li><a href="javascript:void(0)" onclick="quickSearch('Hyderabad','Bangalore')" class="text-reset text-decoration-none">Hyderabad &bull; Bangalore</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3">
+                    <h6 class="fw-bold mb-3 text-light">College Mini Project</h6>
+                    <p class="small text-light opacity-75 mb-2">Subject: <strong>Object-Oriented Programming (OOPS)</strong></p>
+                    <p class="small text-light opacity-75 mb-2">Tech: <strong>Java 17, Spring Boot, MySQL, REST API</strong></p>
+                    <div class="d-flex gap-2 mt-3">
+                        <span class="badge bg-secondary">Encapsulation</span>
+                        <span class="badge bg-secondary">Inheritance</span>
+                        <span class="badge bg-secondary">Polymorphism</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center py-3 border-bottom border-secondary border-opacity-25 small">
+                <span class="text-light opacity-75"><i class="fa-solid fa-lock text-success me-1"></i> Verified Payment Gateway Partners:</span>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <span class="badge bg-white text-dark px-2 py-1"><i class="fa-brands fa-google-pay text-primary"></i> GPay</span>
+                    <span class="badge bg-white text-dark px-2 py-1"><i class="fa-solid fa-wallet text-info"></i> PhonePe</span>
+                    <span class="badge bg-white text-dark px-2 py-1"><i class="fa-solid fa-money-bill-wave text-primary"></i> Paytm</span>
+                    <span class="badge bg-white text-dark px-2 py-1"><i class="fa-solid fa-building-columns text-success"></i> BHIM UPI</span>
+                    <span class="badge bg-white text-dark px-2 py-1"><i class="fa-brands fa-cc-visa text-primary"></i> Visa</span>
+                    <span class="badge bg-white text-dark px-2 py-1"><i class="fa-brands fa-cc-mastercard text-warning"></i> Mastercard</span>
+                    <span class="badge bg-white text-dark px-2 py-1">RuPay</span>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-4 small text-light opacity-50">
+                <p class="mb-0">&copy; 2026 FREEALLA Smart Bus Reservation System. All rights reserved.</p>
+                <div class="d-flex gap-3">
+                    <span>Designed for College OOPS Demonstration</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================================================================= -->
+    <!-- AUTH MODALS (LOGIN & REGISTER) -->
+    <!-- ================================================================= -->
+
+    <!-- LOGIN MODAL -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg p-3">
+                <div class="modal-header border-0 pb-0">
+                    <div>
+                        <h4 class="fw-bold mb-1">Welcome Back!</h4>
+                        <p class="text-muted small mb-0">Sign in to your FREEALLA account</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Quick Demo Credentials Banner -->
+                    <div class="alert alert-light border rounded-3 p-2 mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="fw-bold text-muted"><i class="fa-solid fa-wand-magic-sparkles text-primary me-1"></i> Quick Demo Autofill:</small>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-primary btn-sm py-0" onclick="fillDemoCredentials('USER')">User</button>
+                                <button type="button" class="btn btn-outline-danger btn-sm py-0" onclick="fillDemoCredentials('ADMIN')">Admin</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form onsubmit="handleLoginSubmit(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Email Address</label>
+                            <input type="email" id="loginEmail" class="form-control rounded-3" placeholder="user@busora.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Password</label>
+                            <input type="password" id="loginPassword" class="form-control rounded-3" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-3 py-2 fw-bold brand-gradient-orange border-0 text-white shadow-sm mb-3">
+                            Sign In
+                        </button>
+                    </form>
+                    <p class="text-center small text-muted mb-0">
+                        Don't have an account? <a href="javascript:void(0)" onclick="bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide(); openRegisterModal();" class="text-primary fw-bold text-decoration-none">Sign Up</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg p-3">
+                <div class="modal-header border-0 pb-0">
+                    <div>
+                        <h4 class="fw-bold mb-1">Create Account</h4>
+                        <p class="text-muted small mb-0">Join FREEALLA to manage bookings effortlessly</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form onsubmit="handleRegisterSubmit(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Full Name</label>
+                            <input type="text" id="regName" class="form-control rounded-3" placeholder="e.g. Rahul Sharma" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Email Address</label>
+                            <input type="email" id="regEmail" class="form-control rounded-3" placeholder="e.g. rahul@example.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Mobile Phone</label>
+                            <input type="tel" id="regPhone" class="form-control rounded-3" placeholder="+91 9822012345" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Password</label>
+                            <input type="password" id="regPassword" class="form-control rounded-3" placeholder="At least 6 characters" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Account Role</label>
+                            <select id="regRole" class="form-select rounded-3">
+                                <option value="USER" selected>Passenger (User)</option>
+                                <option value="ADMIN">Fleet Administrator (Admin)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-3 py-2 fw-bold brand-gradient-orange border-0 text-white shadow-sm mb-3">
+                            Create Account
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- App Common Scripts -->
+    <script src="/js/app.js"></script>
+
+    <!-- Page Specific Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const dateInput = document.getElementById('searchDate');
+            if (dateInput) {
+                dateInput.value = tomorrow.toISOString().split('T')[0];
+                dateInput.min = new Date().toISOString().split('T')[0];
+            }
+        });
+
+        function swapCities() {
+            const from = document.getElementById('searchFrom');
+            const to = document.getElementById('searchTo');
+            const tmp = from.value;
+            from.value = to.value;
+            to.value = tmp;
+        }
+
+        function handleSearchSubmit(event) {
+            event.preventDefault();
+            const from = document.getElementById('searchFrom').value.trim();
+            const to = document.getElementById('searchTo').value.trim();
+            const date = document.getElementById('searchDate').value;
+            window.location.href = `/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${encodeURIComponent(date)}`;
+        }
+
+        function quickSearch(from, to) {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const dateStr = tomorrow.toISOString().split('T')[0];
+            window.location.href = `/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${encodeURIComponent(dateStr)}`;
+        }
+    </script>
+</body>
+</html>
+

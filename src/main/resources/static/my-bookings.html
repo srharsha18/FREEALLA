@@ -1,0 +1,261 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings – FREEALLA</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg sticky-top bg-white border-bottom shadow-sm py-2">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-extrabold" href="/">
+                <span class="d-inline-flex justify-content-center align-items-center brand-gradient-orange text-white rounded-3 p-2 shadow-sm" style="width:38px; height:38px;">
+                    <i class="fa-solid fa-bus-simple fs-5"></i>
+                </span>
+                <span class="fs-4 fw-bold tracking-tight text-navy" style="color:var(--primary-navy);">FREE<span class="text-gradient-orange">ALLA</span></span>
+            </a>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#freeallaNav">
+                <i class="fa-solid fa-bars-staggered fs-4"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="freeallaNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-lg-1">
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="/"><i class="fa-solid fa-house me-1"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="/search"><i class="fa-solid fa-magnifying-glass me-1"></i> Search Buses</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-semibold text-primary" href="/my-bookings"><i class="fa-solid fa-ticket me-1"></i> My Bookings</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="/admin"><i class="fa-solid fa-shield-halved me-1 text-danger"></i> Admin Portal</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light rounded-circle p-2 text-muted shadow-sm" onclick="toggleTheme()" title="Toggle Dark/Light Mode" style="width:38px; height:38px;">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <div id="navbar-auth-container" class="d-flex align-items-center gap-2"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HEADER STRIP -->
+    <div class="bg-navy text-white py-4" style="background-color: var(--primary-navy);">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h3 class="fw-bold mb-1">My Booking History</h3>
+                <p class="small text-light opacity-75 mb-0">View all your upcoming, completed, and cancelled tickets</p>
+            </div>
+            <a href="/search" class="btn btn-primary brand-gradient-orange border-0 rounded-pill px-4 fw-bold text-white shadow-sm">
+                <i class="fa-solid fa-plus me-1"></i> Book New Ticket
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN BOOKINGS CONTAINER -->
+    <div class="container py-4 flex-grow-1">
+        
+        <!-- Filter Tabs -->
+        <ul class="nav nav-pills mb-4 gap-2 border-bottom pb-3">
+            <li class="nav-item">
+                <button class="nav-link active rounded-pill px-4 fw-bold filter-tab" onclick="filterBookings('ALL', this)">All Bookings (<span id="countAll">0</span>)</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link rounded-pill px-4 fw-bold filter-tab" onclick="filterBookings('CONFIRMED', this)">Confirmed (<span id="countConfirmed">0</span>)</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link rounded-pill px-4 fw-bold filter-tab" onclick="filterBookings('CANCELLED', this)">Cancelled (<span id="countCancelled">0</span>)</button>
+            </li>
+        </ul>
+
+        <!-- Bookings List -->
+        <div id="bookingsListContainer" class="d-flex flex-column gap-3">
+            <!-- Dynamically populated -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyBookingsCard" class="card border-0 rounded-4 shadow-sm p-5 text-center bg-white d-none">
+            <div class="mb-3 text-muted">
+                <i class="fa-solid fa-ticket fa-3x opacity-25"></i>
+            </div>
+            <h5 class="fw-bold mb-1">No Bookings Found</h5>
+            <p class="text-muted small max-w-md mx-auto mb-4">You haven't made any bus reservations yet, or you may be viewing as a guest.</p>
+            <div>
+                <a href="/search" class="btn btn-primary brand-gradient-orange border-0 rounded-pill px-4 fw-bold text-white">Find & Book Buses Now</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CANCELLATION CONFIRMATION MODAL -->
+    <div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg p-3">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="fw-bold text-danger mb-0"><i class="fa-solid fa-triangle-exclamation me-1"></i> Cancel Reservation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-3">
+                    <p class="mb-2">Are you sure you want to cancel booking <strong id="modalCancelPnr" class="text-dark">PNR</strong>?</p>
+                    <div class="alert alert-warning border-0 rounded-3 small mb-0">
+                        <i class="fa-solid fa-circle-info me-1"></i> Your reserved seats will be immediately released, and a full refund will be initiated to your simulated payment method.
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Keep Ticket</button>
+                    <button type="button" id="btnConfirmCancel" class="btn btn-danger rounded-pill px-4 fw-bold">Yes, Cancel Booking</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+
+    <script>
+        let userBookings = [];
+        let activeTab = 'ALL';
+        let pendingCancelId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserBookings();
+        });
+
+        async function loadUserBookings() {
+            // Check user or fallback to demo user ID 2 (Rahul Sharma)
+            const user = getCurrentUser();
+            const userId = (user && user.userId) ? user.userId : 2;
+
+            try {
+                const res = await fetch(`${API_BASE}/bookings/user/${userId}`);
+                userBookings = await res.json();
+                updateCounts();
+                renderBookings();
+            } catch (err) {
+                showToast('Failed to load your bookings', 'error');
+            }
+        }
+
+        function updateCounts() {
+            document.getElementById('countAll').textContent = userBookings.length;
+            document.getElementById('countConfirmed').textContent = userBookings.filter(b => b.status === 'CONFIRMED').length;
+            document.getElementById('countCancelled').textContent = userBookings.filter(b => b.status === 'CANCELLED').length;
+        }
+
+        function filterBookings(status, tabBtn) {
+            activeTab = status;
+            document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active', 'btn-primary'));
+            tabBtn.classList.add('active');
+            renderBookings();
+        }
+
+        function renderBookings() {
+            const container = document.getElementById('bookingsListContainer');
+            const emptyCard = document.getElementById('emptyBookingsCard');
+
+            const filtered = userBookings.filter(b => {
+                if (activeTab === 'ALL') return true;
+                return b.status === activeTab;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyCard.classList.remove('d-none');
+                return;
+            }
+
+            emptyCard.classList.add('d-none');
+            container.innerHTML = filtered.map(b => {
+                const isConfirmed = b.status === 'CONFIRMED';
+                const statusBadge = isConfirmed 
+                    ? `<span class="badge bg-success px-3 py-1 rounded-pill"><i class="fa-solid fa-check me-1"></i> CONFIRMED</span>`
+                    : `<span class="badge bg-danger px-3 py-1 rounded-pill"><i class="fa-solid fa-xmark me-1"></i> CANCELLED</span>`;
+
+                const seatList = (b.passengers || []).map(p => p.seatNumber).join(', ');
+
+                return `
+                    <div class="card border-0 rounded-4 shadow-sm p-4 bg-white hover-shadow transition">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-3 border-bottom gap-2">
+                            <div>
+                                <span class="small text-muted">PNR Number:</span>
+                                <h5 class="fw-bold font-monospace text-primary mb-0">${b.pnrNumber}</h5>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                ${statusBadge}
+                                <span class="fw-extrabold fs-5 text-dark">${formatCurrency(b.finalAmount)}</span>
+                            </div>
+                        </div>
+
+                        <div class="row align-items-center g-3">
+                            <div class="col-md-5">
+                                <h5 class="fw-bold mb-1">${b.operatorName || 'Bus Operator'}</h5>
+                                <p class="text-muted small mb-2">${b.busType || 'Deluxe'} &bull; ${b.busNumber || ''}</p>
+                                <div class="fw-semibold text-dark">
+                                    <i class="fa-solid fa-location-dot text-danger me-1"></i> ${b.sourceCity} ➔ ${b.destinationCity}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="small text-muted mb-1"><i class="fa-regular fa-calendar me-1"></i> Journey Date: <strong>${formatDate(b.journeyDate)}</strong></div>
+                                <div class="small text-muted mb-1"><i class="fa-regular fa-clock me-1"></i> Departure: <strong>${formatTime(b.departureTime)}</strong></div>
+                                <div class="small text-muted"><i class="fa-solid fa-couch me-1 text-primary"></i> Seats: <strong>${seatList}</strong></div>
+                            </div>
+
+                            <div class="col-md-3 text-md-end d-flex flex-column gap-2">
+                                <a href="/ticket?pnr=${encodeURIComponent(b.pnrNumber)}" class="btn btn-outline-primary rounded-pill btn-sm fw-bold py-2">
+                                    <i class="fa-solid fa-qrcode me-1"></i> View E-Ticket
+                                </a>
+                                ${isConfirmed ? `
+                                    <button class="btn btn-outline-danger rounded-pill btn-sm fw-semibold py-2" onclick="promptCancelBooking(${b.bookingId}, '${b.pnrNumber}')">
+                                        <i class="fa-solid fa-ban me-1"></i> Cancel Booking
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function promptCancelBooking(bookingId, pnr) {
+            pendingCancelId = bookingId;
+            document.getElementById('modalCancelPnr').textContent = pnr;
+            const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('cancelModal'));
+            modal.show();
+
+            document.getElementById('btnConfirmCancel').onclick = executeCancellation;
+        }
+
+        async function executeCancellation() {
+            if (!pendingCancelId) return;
+            const user = getCurrentUser();
+            const userId = (user && user.userId) ? user.userId : 2;
+
+            try {
+                const res = await fetch(`${API_BASE}/bookings/${pendingCancelId}/cancel?userId=${userId}`, {
+                    method: 'PUT'
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast('Booking cancelled successfully and refund initiated', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('cancelModal')).hide();
+                    loadUserBookings();
+                } else {
+                    showToast(data.message || 'Failed to cancel booking', 'error');
+                }
+            } catch (err) {
+                showToast('Server error while cancelling booking', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
+

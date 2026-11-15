@@ -1,0 +1,280 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital E-Ticket – FREEALLA</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Libre+Barcode+39+Text&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .barcode-font {
+            font-family: 'Libre Barcode 39 Text', monospace;
+            font-size: 38px;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- NAVBAR (Hidden on Print) -->
+    <nav class="navbar navbar-expand-lg sticky-top bg-white border-bottom shadow-sm py-2 no-print">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-extrabold" href="/">
+                <span class="d-inline-flex justify-content-center align-items-center brand-gradient-orange text-white rounded-3 p-2 shadow-sm" style="width:38px; height:38px;">
+                    <i class="fa-solid fa-bus-simple fs-5"></i>
+                </span>
+                <span class="fs-4 fw-bold tracking-tight text-navy" style="color:var(--primary-navy);">FREE<span class="text-gradient-orange">ALLA</span></span>
+            </a>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <a href="/my-bookings" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                    <i class="fa-solid fa-ticket me-1"></i> My Bookings
+                </a>
+                <button class="btn btn-primary btn-sm brand-gradient-orange border-0 rounded-pill px-3 fw-bold text-white shadow-sm" onclick="window.print()">
+                    <i class="fa-solid fa-print me-1"></i> Print Ticket
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SUCCESS BANNER (Hidden on Print) -->
+    <div class="container my-4 no-print text-center">
+        <div class="alert alert-success border-0 rounded-4 shadow-sm p-3 d-inline-flex align-items-center gap-2">
+            <i class="fa-solid fa-circle-check fs-4 text-success"></i>
+            <span class="fw-bold">Congratulations! Your bus ticket has been confirmed.</span>
+        </div>
+    </div>
+
+    <!-- E-TICKET CONTAINER -->
+    <div class="container pb-5">
+        <div class="ticket-container" id="ticketCard">
+            
+            <!-- TICKET HEADER -->
+            <div class="ticket-header">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="rounded-3 brand-gradient-orange text-white p-2 d-inline-flex">
+                        <i class="fa-solid fa-bus-simple fs-3"></i>
+                    </span>
+                    <div>
+                        <h3 class="fw-extrabold mb-0 tracking-tight">FREEALLA</h3>
+                        <p class="small text-light opacity-75 mb-0">Official E-Boarding Pass</p>
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <span class="badge bg-success px-3 py-2 rounded-pill fs-6 fw-bold mb-1 shadow-sm" id="ticketStatus">
+                        <i class="fa-solid fa-check me-1"></i> CONFIRMED
+                    </span>
+                    <p class="small text-light opacity-75 mb-0">PNR: <strong class="text-white fs-6" id="ticketPnr">FREEALLA-XXXXXX</strong></p>
+                </div>
+            </div>
+
+            <!-- TICKET BODY -->
+            <div class="ticket-body">
+                
+                <!-- ROUTE & TIMINGS -->
+                <div class="row g-4 align-items-center mb-4 pb-4 border-bottom">
+                    <div class="col-md-5">
+                        <small class="text-muted text-uppercase fw-bold">Departure From</small>
+                        <h2 class="fw-extrabold mb-0" id="ticketSource">Mumbai</h2>
+                        <h4 class="text-primary fw-bold mb-1" id="ticketDepTime">06:30 AM</h4>
+                        <small class="text-muted"><i class="fa-solid fa-location-dot me-1 text-danger"></i> Central Bus Terminal, Bay 4</small>
+                    </div>
+
+                    <div class="col-md-2 text-center my-3 my-md-0">
+                        <div class="badge bg-light text-muted border rounded-pill px-3 py-2">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </div>
+                        <p class="small text-muted mt-1 mb-0" id="ticketJourneyDate">15 Nov 2026</p>
+                    </div>
+
+                    <div class="col-md-5 text-md-end">
+                        <small class="text-muted text-uppercase fw-bold">Arrival At</small>
+                        <h2 class="fw-extrabold mb-0" id="ticketDestination">Pune</h2>
+                        <h4 class="text-primary fw-bold mb-1" id="ticketArrTime">10:00 AM</h4>
+                        <small class="text-muted"><i class="fa-solid fa-location-dot me-1 text-danger"></i> Swargate Intercity Hub</small>
+                    </div>
+                </div>
+
+                <!-- FLEET & OPERATOR DETAILS -->
+                <div class="row g-3 p-3 bg-light rounded-4 mb-4">
+                    <div class="col-md-4">
+                        <small class="text-muted d-block fw-semibold">Bus Operator</small>
+                        <strong class="fs-6" id="ticketOperator">IntrCity SmartBus</strong>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted d-block fw-semibold">Vehicle Number</small>
+                        <strong class="fs-6 font-monospace" id="ticketBusNo">MH-12-BZ-9090</strong>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-muted d-block fw-semibold">Coach Classification</small>
+                        <span class="badge bg-primary rounded-pill px-3 py-1" id="ticketBusType">AC Sleeper</span>
+                    </div>
+                </div>
+
+                <!-- PASSENGERS TABLE -->
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-users text-primary me-2"></i> Passenger & Seat Details</h6>
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered table-striped rounded-3 overflow-hidden">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Passenger Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th class="text-center">Seat Number</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ticketPassengersTbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- FARE BREAKDOWN & QR SECTION -->
+                <div class="row g-4 align-items-center pt-3 border-top">
+                    <!-- QR and Barcode -->
+                    <div class="col-md-6 text-center text-md-start">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="ticket-qr-box shadow-sm">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=FREEALLA-VERIFIED-TICKET" id="ticketQrImage" alt="QR Code" width="85" height="85">
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Scan to Verify Boarding</small>
+                                <div class="barcode-font text-dark" id="ticketBarcodeText">*FREEALLA*</div>
+                                <small class="text-muted" style="font-size:11px;">Txn: <span id="ticketTxnId">TXN-00000</span></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fare Breakdown -->
+                    <div class="col-md-6 text-md-end">
+                        <div class="d-flex justify-content-between justify-content-md-end gap-md-4 mb-1 small">
+                            <span class="text-muted">Total Fare:</span>
+                            <span class="fw-semibold" id="ticketGross">₹0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between justify-content-md-end gap-md-4 mb-1 small text-success">
+                            <span>Promotional Discount:</span>
+                            <span class="fw-bold" id="ticketDiscount">- ₹0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between justify-content-md-end gap-md-4 mb-2 small text-muted">
+                            <span>Payment Method:</span>
+                            <span class="fw-bold text-uppercase" id="ticketPayMethod">UPI</span>
+                        </div>
+                        <div class="d-flex justify-content-between justify-content-md-end gap-md-4 align-items-center pt-2 border-top">
+                            <span class="fw-bold fs-6">Net Paid Amount:</span>
+                            <span class="fw-extrabold fs-4 text-success" id="ticketNetPaid">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IMPORTANT BOARDING INSTRUCTIONS -->
+                <div class="alert alert-light border rounded-3 mt-4 mb-0 small text-muted">
+                    <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-circle-info text-primary me-1"></i> Essential Travel Guidelines:</h6>
+                    <ul class="mb-0 ps-3">
+                        <li>Please report at the boarding point at least <strong>30 minutes</strong> before scheduled departure time.</li>
+                        <li>Carry a valid government-issued photo ID card (Aadhaar, Passport, Driving License, PAN).</li>
+                        <li>This digital e-ticket is environmentally friendly; physical printout is optional.</li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ACTION BUTTONS (Hidden on Print) -->
+        <div class="d-flex justify-content-center gap-3 mt-4 no-print">
+            <button class="btn btn-outline-dark rounded-pill px-4 fw-semibold" onclick="window.print()">
+                <i class="fa-solid fa-print me-1"></i> Print / Save PDF
+            </button>
+            <a href="/" class="btn btn-primary brand-gradient-orange border-0 rounded-pill px-4 fw-bold text-white shadow-sm">
+                <i class="fa-solid fa-house me-1"></i> Return Home
+            </a>
+            <a href="/my-bookings" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+                <i class="fa-solid fa-ticket me-1"></i> View All Bookings
+            </a>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const pnr = urlParams.get('pnr');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!pnr) {
+                showToast('No PNR specified', 'error');
+                setTimeout(() => window.location.href = '/', 1000);
+                return;
+            }
+            loadTicketDetails();
+        });
+
+        async function loadTicketDetails() {
+            try {
+                const res = await fetch(`${API_BASE}/bookings/pnr/${encodeURIComponent(pnr)}`);
+                if (!res.ok) {
+                    showToast('Ticket not found for PNR: ' + pnr, 'error');
+                    return;
+                }
+                const b = await res.json();
+                renderTicket(b);
+            } catch (err) {
+                showToast('Failed to retrieve ticket', 'error');
+            }
+        }
+
+        function renderTicket(b) {
+            document.getElementById('ticketPnr').textContent = b.pnrNumber;
+            document.getElementById('ticketStatus').textContent = b.status;
+            if (b.status === 'CANCELLED') {
+                document.getElementById('ticketStatus').className = 'badge bg-danger px-3 py-2 rounded-pill fs-6 fw-bold mb-1 shadow-sm';
+            }
+
+            document.getElementById('ticketSource').textContent = b.sourceCity;
+            document.getElementById('ticketDestination').textContent = b.destinationCity;
+            document.getElementById('ticketDepTime').textContent = formatTime(b.departureTime);
+            document.getElementById('ticketArrTime').textContent = formatTime(b.arrivalTime);
+            document.getElementById('ticketJourneyDate').textContent = formatDate(b.journeyDate);
+
+            document.getElementById('ticketOperator').textContent = b.operatorName;
+            document.getElementById('ticketBusNo').textContent = b.busNumber;
+            document.getElementById('ticketBusType').textContent = b.busType;
+
+            document.getElementById('ticketGross').textContent = formatCurrency(b.totalAmount);
+            document.getElementById('ticketDiscount').textContent = '- ' + formatCurrency(b.discountAmount);
+            document.getElementById('ticketPayMethod').textContent = b.paymentMethod || 'UPI';
+            document.getElementById('ticketNetPaid').textContent = formatCurrency(b.finalAmount);
+            document.getElementById('ticketTxnId').textContent = b.paymentTransactionId || 'TXN-FREEALLA';
+            document.getElementById('ticketBarcodeText').textContent = `*${b.pnrNumber}*`;
+
+            // Update QR code with PNR verification data
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=FREEALLA|${b.pnrNumber}|${b.sourceCity}-${b.destinationCity}|${b.journeyDate}`;
+            document.getElementById('ticketQrImage').src = qrUrl;
+
+            // Render passengers
+            const tbody = document.getElementById('ticketPassengersTbody');
+            tbody.innerHTML = (b.passengers || []).map((p, i) => `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td class="fw-bold">${p.passengerName}</td>
+                    <td>${p.age}</td>
+                    <td>${p.gender}</td>
+                    <td class="text-center"><span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold">${p.seatNumber}</span></td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
+
