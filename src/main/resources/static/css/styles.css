@@ -6,28 +6,21 @@
    =================================================================== */
 
 :root {
-  /* 1. Header, Navbar & Dark Text */
-  --primary-navy: #0b132b;          /* Deep space midnight blue */
-  --primary-blue: #4f46e5;          /* Modern Electric Indigo */
-  --primary-accent: #6366f1;        /* Soft purple-blue glow */
-
-  /* 2. Main Action Buttons (Search, Select Seats, Pay Now) */
-  --secondary-orange: #ff5a5f;      /* Vibrant Sunset Coral (Airbnb / Uber style) */
-  --secondary-orange-hover: #e0484d;
-  --secondary-orange-light: #fff1f2;
-
-  /* 3. Page Background & Clean White Cards */
-  --bg-page: #f8fafc;               /* Soft, clean slate background */
-  --bg-card: #ffffff;               /* Crisp pure white cards */
-  --text-main: #0f172a;             /* High-contrast readable text */
-  --text-muted: #64748b;            /* Soft sub-text */
-  --border-color: #e2e8f0;          /* Subtle light borders */
-
-  /* 4. Interactive Bus Seat Map Colors */
-  --seat-available: #10b981;        /* Fresh Emerald Green (Available) */
-  --seat-selected: #ff5a5f;         /* Sunset Coral (When you click a seat) */
-  --seat-booked: #94a3b8;           /* Clean Slate Grey (Already booked) */
-  --seat-ladies: #ec4899;           /* Soft Pink (Ladies reserved) */
+  --primary-navy: #1e1b4b;          /* Midnight purple */
+  --primary-blue: #6366f1;          /* Electric indigo */
+  --primary-accent: #8b5cf6;        /* Violet accent */
+  --secondary-orange: #884ef4;      /* Deep violet button */
+  --secondary-orange-hover: #6d28d9;
+  --secondary-orange-light: #f5f3ff;
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #1e1b4b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --seat-available: #14e19d;
+  --seat-selected: #7c3aed;
+  --seat-booked: #94a3b8;
+  --seat-ladies: #ff0077;           /* Soft Pink (Ladies reserved) */
 
   /* 5. Modern Drop Shadows */
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.07);
