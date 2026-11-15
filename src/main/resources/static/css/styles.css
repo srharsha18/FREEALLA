@@ -6,29 +6,35 @@
    =================================================================== */
 
 :root {
-  --primary-navy: #0f172a;
-  --primary-blue: #1e3a8a;
-  --primary-accent: #2563eb;
-  --secondary-orange: #ff5722;
-  --secondary-orange-hover: #e64a19;
-  --secondary-orange-light: #fff3e0;
-  
-  --bg-page: #f8fafc;
-  --bg-card: #ffffff;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --border-color: #e2e8f0;
-  
-  --seat-available: #10b981;
-  --seat-selected: #ff5722;
-  --seat-booked: #94a3b8;
-  --seat-ladies: #ec4899;
-  
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --radius-card: 1rem;
+  /* 1. Header, Navbar & Dark Text */
+  --primary-navy: #0b132b;          /* Deep space midnight blue */
+  --primary-blue: #4f46e5;          /* Modern Electric Indigo */
+  --primary-accent: #6366f1;        /* Soft purple-blue glow */
+
+  /* 2. Main Action Buttons (Search, Select Seats, Pay Now) */
+  --secondary-orange: #ff5a5f;      /* Vibrant Sunset Coral (Airbnb / Uber style) */
+  --secondary-orange-hover: #e0484d;
+  --secondary-orange-light: #fff1f2;
+
+  /* 3. Page Background & Clean White Cards */
+  --bg-page: #f8fafc;               /* Soft, clean slate background */
+  --bg-card: #ffffff;               /* Crisp pure white cards */
+  --text-main: #0f172a;             /* High-contrast readable text */
+  --text-muted: #64748b;            /* Soft sub-text */
+  --border-color: #e2e8f0;          /* Subtle light borders */
+
+  /* 4. Interactive Bus Seat Map Colors */
+  --seat-available: #10b981;        /* Fresh Emerald Green (Available) */
+  --seat-selected: #ff5a5f;         /* Sunset Coral (When you click a seat) */
+  --seat-booked: #94a3b8;           /* Clean Slate Grey (Already booked) */
+  --seat-ladies: #ec4899;           /* Soft Pink (Ladies reserved) */
+
+  /* 5. Modern Drop Shadows */
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.07);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.08);
+  --shadow-lg: 0 12px 24px -4px rgb(0 0 0 / 0.12);
+  --shadow-xl: 0 20px 35px -5px rgb(15 23 42 / 0.15);
+  --radius-card: 1.25rem;
 }
 
 /* Dark Mode Theme */
@@ -78,23 +84,23 @@ body {
 
 /* Brand Accent Gradients */
 .brand-gradient {
-  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+  background: linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #4f46e5 100%) !important;
 }
 
 .brand-gradient-orange {
-  background: linear-gradient(135deg, #ff5722 0%, #ff7043 100%);
+  background: linear-gradient(135deg, #ff5a5f 0%, #ff7e67 100%) !important;
 }
 
 .text-gradient-orange {
-  background: linear-gradient(135deg, #ff5722 0%, #ff8a65 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: linear-gradient(135deg, #ff5a5f 0%, #ff8a65 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 /* Hero Section */
 .hero-wrapper {
   position: relative;
-  background: linear-gradient(135deg, #091325 0%, #0f172a 60%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #070d1e 0%, #0b132b 50%, #1e1b4b 100%) !important;
   color: #ffffff;
   padding: 4rem 1.5rem 6.5rem 1.5rem;
   overflow: hidden;
